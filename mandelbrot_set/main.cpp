@@ -18,9 +18,6 @@
 //        color : = palette[iteration]
 //        plot(Px, Py, color)
 
-import <iostream>;
-import <format>;
-import <complex>;
 import <cmath>;
 #include <SFML/Graphics.hpp>
 
