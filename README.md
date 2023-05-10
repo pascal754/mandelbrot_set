@@ -29,6 +29,13 @@ Version 17.6.0 Preview 6.0
 
 - SFML 2.5.1 via vcpkg
 
+## Usage
+
+- R: Reset view
+- I: Zoom in
+- O: Zoom out
+- Arrow kyes: move the object
+
 ## Screenshot
 
 ![screenshot](Screenshot.png)
