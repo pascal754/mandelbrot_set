@@ -27,6 +27,7 @@ constexpr double yMax{ 1.12 };
 constexpr unsigned maxIteration{ 1000 };
 constexpr unsigned width{ 800 };
 constexpr unsigned height{ 800 };
+constexpr double zoomUnit{ 1.5 };
 
 void make_pixels(sf::VertexArray& va);
 void update_colors(sf::VertexArray& va, const double scale, const double dx, const double dy);
@@ -53,7 +54,7 @@ int main()
                 window.close();
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::I)) // zoom in
             {
-                scale *= 1.5;
+                scale *= zoomUnit;
                 update = true;
             }
             else if (sf::Keyboard::isKeyPressed(sf::Keyboard::O)) // zoom out
@@ -63,7 +64,7 @@ int main()
                     continue;
                 }
 
-                scale /= 1.5;
+                scale /= zoomUnit;
                 update = true;
                 if (scale < 1.0)
                 {
