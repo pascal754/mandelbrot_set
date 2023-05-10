@@ -56,7 +56,7 @@ int main()
                 scale *= 1.5;
                 update = true;
             }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::O)) // zoom out
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::O)) // zoom out
             {
                 if (scale == 1.0)
                 {
@@ -70,27 +70,27 @@ int main()
                     scale = 1.0;
                 }
             }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
             {
                 deltaX += 0.5 / scale;
                 update = true;
             }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
             {
                 deltaX -= 0.5 / scale;
                 update = true;
             }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
             {
                 deltaY += 0.5 / scale;
                 update = true;
             }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
             {
                 deltaY -= 0.5 / scale;
                 update = true;
             }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) // reset
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) // reset
             {
                 scale = 1.0;
                 deltaX = 0.0;
