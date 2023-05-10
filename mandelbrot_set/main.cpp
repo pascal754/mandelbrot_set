@@ -71,22 +71,22 @@ int main()
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
             {
-                deltaX += 0.1;
+                deltaX += 0.5 / scale;
                 update_colors(pixels, scale, deltaX, deltaY);
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
             {
-                deltaX -= 0.1;
+                deltaX -= 0.5 / scale;
                 update_colors(pixels, scale, deltaX, deltaY);
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
             {
-                deltaY += 0.1;
+                deltaY += 0.5 / scale;
                 update_colors(pixels, scale, deltaX, deltaY);
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
             {
-                deltaY -= 0.1;
+                deltaY -= 0.5 / scale;
                 update_colors(pixels, scale, deltaX, deltaY);
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) // reset
@@ -139,8 +139,8 @@ void update_colors(sf::VertexArray& va, const double scale, const double dx, con
 
 unsigned get_color(const double px, const double py, const double scale, const double dx, const double dy)
 {
-    double x0{ ((xMax - xMin) * px / width + xMin + dx) / scale};
-    double y0{ ((yMax - yMin) * py / height + yMin + dy) / scale};
+    double x0{ ((xMax - xMin) * px / width + xMin) / scale + dx };
+    double y0{ ((yMax - yMin) * py / height + yMin) / scale + dy };
 
     double x{};
     double y{};
