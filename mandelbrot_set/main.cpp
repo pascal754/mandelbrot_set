@@ -37,6 +37,7 @@ int main()
     double scale{ 1.0 };
     double deltaX{};
     double deltaY{};
+    bool update{};
     sf::VertexArray pixels{sf::Points};
     make_pixels(pixels);
 
@@ -53,7 +54,7 @@ int main()
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::I)) // zoom in
             {
                 scale *= 1.5;
-                update_colors(pixels, scale, deltaX, deltaY);
+                update = true;
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::O)) // zoom out
             {
@@ -63,7 +64,7 @@ int main()
                 }
 
                 scale /= 1.5;
-                update_colors(pixels, scale, deltaX, deltaY);
+                update = true;
                 if (scale < 1.0)
                 {
                     scale = 1.0;
@@ -72,30 +73,36 @@ int main()
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
             {
                 deltaX += 0.5 / scale;
-                update_colors(pixels, scale, deltaX, deltaY);
+                update = true;
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
             {
                 deltaX -= 0.5 / scale;
-                update_colors(pixels, scale, deltaX, deltaY);
+                update = true;
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
             {
                 deltaY += 0.5 / scale;
-                update_colors(pixels, scale, deltaX, deltaY);
+                update = true;
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
             {
                 deltaY -= 0.5 / scale;
-                update_colors(pixels, scale, deltaX, deltaY);
+                update = true;
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) // reset
             {
                 scale = 1.0;
                 deltaX = 0.0;
                 deltaY = 0.0;
-                update_colors(pixels, scale, deltaX, deltaY);
+                update = true;
             }
+        }
+
+        if (update)
+        {
+            update_colors(pixels, scale, deltaX, deltaY);
+            update = false;
         }
 
         window.clear();
