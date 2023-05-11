@@ -18,6 +18,7 @@
 //        color : = palette[iteration]
 //        plot(Px, Py, color)
 
+#include <fmt/core.h>
 #include <SFML/Graphics.hpp>
 
 constexpr double xMin{ -2.0 };
@@ -51,7 +52,16 @@ int main()
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
+            {
                 window.close();
+            }
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+            {
+                auto pos{ sf::Mouse::getPosition(window) };
+                deltaX -= (xMax - xMin) * (width / 2.0 - pos.x) / width / scale;
+                deltaY -= (yMax - yMin) * (pos.y - height / 2.0) / height / scale;
+                update = true;
+            }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::I)) // zoom in
             {
                 scale *= zoomUnit;
