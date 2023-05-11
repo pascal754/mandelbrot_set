@@ -148,7 +148,7 @@ void update_colors(sf::VertexArray& va, const double scale, const double dx, con
 unsigned get_color(const double px, const double py, const double scale, const double dx, const double dy)
 {
     double x0{ ((xMax - xMin) * px / width + xMin) / scale + dx };
-    double y0{ ((yMax - yMin) * py / height + yMin) / scale + dy };
+    double y0{ ((yMax - yMin) * (height - py) / height + yMin) / scale + dy };
 
     double x{};
     double y{};
