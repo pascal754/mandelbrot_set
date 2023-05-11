@@ -65,7 +65,9 @@ int main()
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::I)) // zoom in
             {
                 scale *= zoomUnit;
+                //deltaX += (xMin + xMax) / 2.0 / scale;
                 update = true;
+                //fmt::print("deltaX: {}\n", deltaX);
             }
             else if (sf::Keyboard::isKeyPressed(sf::Keyboard::O)) // zoom out
             {
@@ -93,12 +95,12 @@ int main()
             }
             else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
             {
-                deltaY += 0.5 / scale;
+                deltaY -= 0.5 / scale;
                 update = true;
             }
             else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
             {
-                deltaY -= 0.5 / scale;
+                deltaY += 0.5 / scale;
                 update = true;
             }
             else if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) // reset
