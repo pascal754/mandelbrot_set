@@ -18,7 +18,6 @@
 //        color : = palette[iteration]
 //        plot(Px, Py, color)
 
-import <iostream>;
 #include <SFML/Graphics.hpp>
 
 constexpr double xMin{ -2.0 };
@@ -58,7 +57,7 @@ int main()
             }
             else if (event.type == sf::Event::MouseWheelScrolled) // zoom in/out centered at mouse cursor position
             {
-                if (event.mouseWheelScroll.delta > 0)
+                if (event.mouseWheelScroll.delta > 0) // zoom in
                 {
                     deltaX += ((xMax - xMin) * event.mouseWheelScroll.x / width + xMin) / scale;
                     deltaY += ((yMax - yMin) * (height - event.mouseWheelScroll.y) / height + yMin) / scale;
@@ -67,7 +66,7 @@ int main()
                     deltaY -= ((yMax - yMin) * (height - event.mouseWheelScroll.y) / height + yMin) / scale;
                     update = true;
                 }
-                else
+                else // zoom out
                 {
                     if (scale == 1.0)
                     {
@@ -158,7 +157,6 @@ int main()
 
         window.display();
     }
-
 }
 
 void make_pixels(sf::VertexArray& va)
