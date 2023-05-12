@@ -172,8 +172,9 @@ void make_pixels(sf::VertexArray& va)
 
 void update_colors(sf::VertexArray& va, const double scale, const double dx, const double dy)
 {
-    // double x0{ ((xMax - xMin) * va[i].position.x / width + xMin) / scale + dx };
-    // double y0{ ((yMax - yMin) * (height - va[i].position.y) / height + yMin) / scale + dy };
+    // x0{ ((xMax - xMin) * va[i].position.x / width + xMin) / scale + dx };
+    // y0{ ((yMax - yMin) * (height - va[i].position.y) / height + yMin) / scale + dy };
+    // to save computations rewrite above two lines with coefficients and offsets
 
     auto xCoeff{ (xMax - xMin) / width / scale };
     auto xOffset{ xMin / scale + dx };
