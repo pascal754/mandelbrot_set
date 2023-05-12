@@ -31,11 +31,12 @@ Version 17.6.0 Preview 6.0
 
 ## Usage
 
-- R: Reset view
-- I: Zoom in
-- O: Zoom out
-- Arrow kyes: move the object
-- Mouse left button click: set the mouse cursor point to the center of the window
+- R: Reset the view to 1:1 scale
+- I: Zoom in around the center of the window
+- O: Zoom out around the center of the window
+- Arrow kyes: move the image
+- Mouse left button click: move the mouse click point to the center of the window
+- Mouse scroll up/down: zoom in/out anchored at the mouse cursor position
 
 ## Screenshot
 
