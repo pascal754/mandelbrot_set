@@ -18,7 +18,7 @@
 //        color : = palette[iteration]
 //        plot(Px, Py, color)
 
-#include <fmt/core.h>
+import <iostream>;
 #include <SFML/Graphics.hpp>
 
 constexpr double xMin{ -2.0 };
@@ -54,6 +54,35 @@ int main()
             if (event.type == sf::Event::Closed)
             {
                 window.close();
+            }
+            else if (event.type == sf::Event::MouseWheelScrolled) // zoom in/out centered at mouse cursor position
+            {
+                if (event.mouseWheelScroll.delta > 0)
+                {
+                    deltaX += ((xMax - xMin) * event.mouseWheelScroll.x / width + xMin) / scale;
+                    deltaY += ((yMax - yMin) * (height - event.mouseWheelScroll.y) / height + yMin) / scale;
+                    scale *= zoomUnit;
+                    deltaX -= ((xMax - xMin) * event.mouseWheelScroll.x / width + xMin) / scale;
+                    deltaY -= ((yMax - yMin) * (height - event.mouseWheelScroll.y) / height + yMin) / scale;
+                    update = true;
+                }
+                else
+                {
+                    if (scale == 1.0)
+                    {
+                        continue;
+                    }
+                    deltaX += ((xMax - xMin) * event.mouseWheelScroll.x / width + xMin) / scale;
+                    deltaY += ((yMax - yMin) * (height - event.mouseWheelScroll.y) / height + yMin) / scale;
+                    scale /= zoomUnit;
+                    deltaX -= ((xMax - xMin) * event.mouseWheelScroll.x / width + xMin) / scale;
+                    deltaY -= ((yMax - yMin) * (height - event.mouseWheelScroll.y) / height + yMin) / scale;
+                    update = true;
+                    if (scale < 1.0)
+                    {
+                        scale = 1.0;
+                    }
+                }
             }
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
             {
