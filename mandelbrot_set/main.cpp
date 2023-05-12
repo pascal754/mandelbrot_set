@@ -31,7 +31,6 @@ constexpr double zoomUnit{ 1.5 };
 
 void make_pixels(sf::VertexArray& va);
 void update_colors(sf::VertexArray& va, const double scale, const double dx, const double dy);
-unsigned get_color(const double px, const double py, const double scale = 1.0, const double dx = 0.0, const double dy = 0.0);
 
 int main()
 {
@@ -165,45 +164,40 @@ void make_pixels(sf::VertexArray& va)
     {
         for (unsigned py{}; py < height; ++py)
         {
-            unsigned color{ get_color(px, py) };
-
-            va.append(sf::Vertex{
-                sf::Vector2f{static_cast<float>(px), static_cast<float>(py)},
-                sf::Color{
-                    static_cast<sf::Uint8>(color / 256),
-                    static_cast<sf::Uint8>(color % 256),
-                    0}}
-            );
+            va.append(sf::Vertex{sf::Vector2f{static_cast<float>(px), static_cast<float>(py)}});
         }
     }
+    update_colors(va, 1.0, 0.0, 0.0);
 }
 
 void update_colors(sf::VertexArray& va, const double scale, const double dx, const double dy)
 {
+    // double x0{ ((xMax - xMin) * va[i].position.x / width + xMin) / scale + dx };
+    // double y0{ ((yMax - yMin) * (height - va[i].position.y) / height + yMin) / scale + dy };
+
+    auto xCoeff{ (xMax - xMin) / width / scale };
+    auto xOffset{ xMin / scale + dx };
+    auto yCoeff{-(yMax - yMin) /height / scale};
+    auto yOffset{yMax / scale + dy};
+
     for (size_t i{}; i < va.getVertexCount(); ++i)
     {
-        unsigned color{ get_color(va[i].position.x, va[i].position.y, scale, dx, dy) };
+        double x0{ xCoeff * va[i].position.x + xOffset };
+        double y0{ yCoeff * va[i].position.y + yOffset };
 
-        va[i].color.r = static_cast<sf::Uint8>(color / 256);
-        va[i].color.g = static_cast<sf::Uint8>(color % 256);
+        double x{};
+        double y{};
+        unsigned iteration{};
+        while (x * x + y * y <= 4.0 && iteration < maxIteration)
+        {
+            double xTemp{ x * x - y * y + x0 };
+            y = 2.0 * x * y + y0;
+            x = xTemp;
+            ++iteration;
+        }
+
+        va[i].color.r = static_cast<sf::Uint8>(iteration / 256 * 5 + 127);
+        va[i].color.g = static_cast<sf::Uint8>(iteration % 256);
+        va[i].color.b = static_cast<sf::Uint8>(127);
     }
-}
-
-unsigned get_color(const double px, const double py, const double scale, const double dx, const double dy)
-{
-    double x0{ ((xMax - xMin) * px / width + xMin) / scale + dx };
-    double y0{ ((yMax - yMin) * (height - py) / height + yMin) / scale + dy };
-
-    double x{};
-    double y{};
-    unsigned iteration{};
-    while (x * x + y * y <= 4.0 && iteration < maxIteration)
-    {
-        double xTemp{ x * x - y * y + x0 };
-        y = 2.0 * x * y + y0;
-        x = xTemp;
-        ++iteration;
-    }
-
-    return iteration;
 }
