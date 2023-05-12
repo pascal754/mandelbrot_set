@@ -45,6 +45,7 @@ int main()
 
     sf::RenderWindow window(sf::VideoMode(width, height), "Mandelbrot Set", sf::Style::Titlebar | sf::Style::Close);
     window.setFramerateLimit(60);
+    window.setKeyRepeatEnabled(false);
 
     while (window.isOpen())
     {
@@ -84,61 +85,64 @@ int main()
                     }
                 }
             }
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+            else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
             {
                 auto pos{ sf::Mouse::getPosition(window) };
                 deltaX -= (xMax - xMin) * (width / 2.0 - pos.x) / width / scale;
                 deltaY -= (yMax - yMin) * (pos.y - height / 2.0) / height / scale;
                 update = true;
             }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::I)) // zoom in
+            else if (event.type == sf::Event::KeyPressed)
             {
-                deltaX += (xMin + xMax) / 2.0 / scale;
-                scale *= zoomUnit;
-                deltaX -= (xMin + xMax) / 2.0 / scale;
-                update = true;
-            }
-            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::O)) // zoom out
-            {
-                if (scale == 1.0)
+                if (event.key.code == sf::Keyboard::I) // zoom in
                 {
-                    continue;
+                    deltaX += (xMin + xMax) / 2.0 / scale;
+                    scale *= zoomUnit;
+                    deltaX -= (xMin + xMax) / 2.0 / scale;
+                    update = true;
                 }
-                deltaX += (xMin + xMax) / 2.0 / scale;
-                scale /= zoomUnit;
-                deltaX -= (xMin + xMax) / 2.0 / scale;
-                update = true;
-                if (scale < 1.0)
+                else if (event.key.code == sf::Keyboard::O) // zoom out
+                {
+                    if (scale == 1.0)
+                    {
+                        continue;
+                    }
+                    deltaX += (xMin + xMax) / 2.0 / scale;
+                    scale /= zoomUnit;
+                    deltaX -= (xMin + xMax) / 2.0 / scale;
+                    update = true;
+                    if (scale < 1.0)
+                    {
+                        scale = 1.0;
+                    }
+                }
+                else if (event.key.code == sf::Keyboard::Left)
+                {
+                    deltaX += 0.5 / scale;
+                    update = true;
+                }
+                else if (event.key.code == sf::Keyboard::Right)
+                {
+                    deltaX -= 0.5 / scale;
+                    update = true;
+                }
+                else if (event.key.code == sf::Keyboard::Up)
+                {
+                    deltaY -= 0.5 / scale;
+                    update = true;
+                }
+                else if (event.key.code == sf::Keyboard::Down)
+                {
+                    deltaY += 0.5 / scale;
+                    update = true;
+                }
+                else if (event.key.code == sf::Keyboard::R) // reset
                 {
                     scale = 1.0;
+                    deltaX = 0.0;
+                    deltaY = 0.0;
+                    update = true;
                 }
-            }
-            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-            {
-                deltaX += 0.5 / scale;
-                update = true;
-            }
-            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-            {
-                deltaX -= 0.5 / scale;
-                update = true;
-            }
-            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-            {
-                deltaY -= 0.5 / scale;
-                update = true;
-            }
-            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-            {
-                deltaY += 0.5 / scale;
-                update = true;
-            }
-            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) // reset
-            {
-                scale = 1.0;
-                deltaX = 0.0;
-                deltaY = 0.0;
-                update = true;
             }
         }
 
