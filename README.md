@@ -35,6 +35,7 @@ Version 17.6.0 Preview 6.0
 - I: Zoom in
 - O: Zoom out
 - Arrow kyes: move the object
+- Mouse left button click: set the mouse cursor point to the center of the window
 
 ## Screenshot
 
