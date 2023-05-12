@@ -41,3 +41,5 @@ Version 17.6.0 Preview 6.0
 ## Screenshot
 
 ![screenshot](Screenshot.png)
+
+![screenshot](Screenshot2.png)
