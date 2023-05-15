@@ -19,6 +19,10 @@
 //        plot(Px, Py, color)
 
 #include <SFML/Graphics.hpp>
+import <iostream>;
+import <vector>;
+import <thread>;
+import <stdexcept>;
 
 constexpr double xMin{ -2.0 };
 constexpr double xMax{ 0.47 };
@@ -31,130 +35,142 @@ constexpr double zoomUnit{ 1.5 };
 
 void make_pixels(sf::VertexArray& va);
 void update_colors(sf::VertexArray& va, const double scale, const double dx, const double dy);
+void update_colors_ranges(sf::VertexArray& va, const size_t begin, const size_t end, const double scale, const double dx, const double dy);
 
 int main()
 {
-    double scale{ 1.0 };
-    double deltaX{};
-    double deltaY{};
-    bool update{};
-    sf::VertexArray pixels{sf::Points};
-    make_pixels(pixels);
-
-    sf::RenderWindow window(sf::VideoMode(width, height), "Mandelbrot Set", sf::Style::Titlebar | sf::Style::Close);
-    window.setFramerateLimit(60);
-    window.setKeyRepeatEnabled(false);
-
-    while (window.isOpen())
+    try
     {
-        sf::Event event;
-        while (window.pollEvent(event))
+        double scale{ 1.0 };
+        double deltaX{};
+        double deltaY{};
+        bool update{};
+        sf::VertexArray pixels{sf::Points};
+        make_pixels(pixels);
+
+        sf::RenderWindow window(sf::VideoMode(width, height), "Mandelbrot Set", sf::Style::Titlebar | sf::Style::Close);
+        window.setFramerateLimit(60);
+        window.setKeyRepeatEnabled(false);
+
+        while (window.isOpen())
         {
-            if (event.type == sf::Event::Closed)
+            sf::Event event;
+            while (window.pollEvent(event))
             {
-                window.close();
-            }
-            else if (event.type == sf::Event::MouseWheelScrolled) // zoom in/out centered at mouse cursor position
-            {
-                if (event.mouseWheelScroll.delta > 0) // zoom in
+                if (event.type == sf::Event::Closed)
                 {
-                    deltaX += ((xMax - xMin) * event.mouseWheelScroll.x / width + xMin) / scale;
-                    deltaY += ((yMax - yMin) * (height - event.mouseWheelScroll.y) / height + yMin) / scale;
-                    scale *= zoomUnit;
-                    deltaX -= ((xMax - xMin) * event.mouseWheelScroll.x / width + xMin) / scale;
-                    deltaY -= ((yMax - yMin) * (height - event.mouseWheelScroll.y) / height + yMin) / scale;
+                    window.close();
+                }
+                else if (event.type == sf::Event::MouseWheelScrolled) // zoom in/out centered at mouse cursor position
+                {
+                    if (event.mouseWheelScroll.delta > 0) // zoom in
+                    {
+                        deltaX += ((xMax - xMin) * event.mouseWheelScroll.x / width + xMin) / scale;
+                        deltaY += ((yMax - yMin) * (height - event.mouseWheelScroll.y) / height + yMin) / scale;
+                        scale *= zoomUnit;
+                        deltaX -= ((xMax - xMin) * event.mouseWheelScroll.x / width + xMin) / scale;
+                        deltaY -= ((yMax - yMin) * (height - event.mouseWheelScroll.y) / height + yMin) / scale;
+                        update = true;
+                    }
+                    else // zoom out
+                    {
+                        if (scale == 1.0)
+                        {
+                            continue;
+                        }
+                        deltaX += ((xMax - xMin) * event.mouseWheelScroll.x / width + xMin) / scale;
+                        deltaY += ((yMax - yMin) * (height - event.mouseWheelScroll.y) / height + yMin) / scale;
+                        scale /= zoomUnit;
+                        deltaX -= ((xMax - xMin) * event.mouseWheelScroll.x / width + xMin) / scale;
+                        deltaY -= ((yMax - yMin) * (height - event.mouseWheelScroll.y) / height + yMin) / scale;
+                        update = true;
+                        if (scale < 1.0)
+                        {
+                            scale = 1.0;
+                        }
+                    }
+                }
+                else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
+                {
+                    auto pos{ sf::Mouse::getPosition(window) };
+                    deltaX -= (xMax - xMin) * (width / 2.0 - pos.x) / width / scale;
+                    deltaY -= (yMax - yMin) * (pos.y - height / 2.0) / height / scale;
                     update = true;
                 }
-                else // zoom out
+                else if (event.type == sf::Event::KeyPressed)
                 {
-                    if (scale == 1.0)
+                    if (event.key.code == sf::Keyboard::I) // zoom in
                     {
-                        continue;
+                        deltaX += (xMin + xMax) / 2.0 / scale;
+                        scale *= zoomUnit;
+                        deltaX -= (xMin + xMax) / 2.0 / scale;
+                        update = true;
                     }
-                    deltaX += ((xMax - xMin) * event.mouseWheelScroll.x / width + xMin) / scale;
-                    deltaY += ((yMax - yMin) * (height - event.mouseWheelScroll.y) / height + yMin) / scale;
-                    scale /= zoomUnit;
-                    deltaX -= ((xMax - xMin) * event.mouseWheelScroll.x / width + xMin) / scale;
-                    deltaY -= ((yMax - yMin) * (height - event.mouseWheelScroll.y) / height + yMin) / scale;
-                    update = true;
-                    if (scale < 1.0)
+                    else if (event.key.code == sf::Keyboard::O) // zoom out
+                    {
+                        if (scale == 1.0)
+                        {
+                            continue;
+                        }
+                        deltaX += (xMin + xMax) / 2.0 / scale;
+                        scale /= zoomUnit;
+                        deltaX -= (xMin + xMax) / 2.0 / scale;
+                        update = true;
+                        if (scale < 1.0)
+                        {
+                            scale = 1.0;
+                        }
+                    }
+                    else if (event.key.code == sf::Keyboard::Left)
+                    {
+                        deltaX += 0.5 / scale;
+                        update = true;
+                    }
+                    else if (event.key.code == sf::Keyboard::Right)
+                    {
+                        deltaX -= 0.5 / scale;
+                        update = true;
+                    }
+                    else if (event.key.code == sf::Keyboard::Up)
+                    {
+                        deltaY -= 0.5 / scale;
+                        update = true;
+                    }
+                    else if (event.key.code == sf::Keyboard::Down)
+                    {
+                        deltaY += 0.5 / scale;
+                        update = true;
+                    }
+                    else if (event.key.code == sf::Keyboard::R) // reset
                     {
                         scale = 1.0;
+                        deltaX = 0.0;
+                        deltaY = 0.0;
+                        update = true;
                     }
                 }
             }
-            else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
+
+            if (update)
             {
-                auto pos{ sf::Mouse::getPosition(window) };
-                deltaX -= (xMax - xMin) * (width / 2.0 - pos.x) / width / scale;
-                deltaY -= (yMax - yMin) * (pos.y - height / 2.0) / height / scale;
-                update = true;
+                update_colors(pixels, scale, deltaX, deltaY);
+                update = false;
             }
-            else if (event.type == sf::Event::KeyPressed)
-            {
-                if (event.key.code == sf::Keyboard::I) // zoom in
-                {
-                    deltaX += (xMin + xMax) / 2.0 / scale;
-                    scale *= zoomUnit;
-                    deltaX -= (xMin + xMax) / 2.0 / scale;
-                    update = true;
-                }
-                else if (event.key.code == sf::Keyboard::O) // zoom out
-                {
-                    if (scale == 1.0)
-                    {
-                        continue;
-                    }
-                    deltaX += (xMin + xMax) / 2.0 / scale;
-                    scale /= zoomUnit;
-                    deltaX -= (xMin + xMax) / 2.0 / scale;
-                    update = true;
-                    if (scale < 1.0)
-                    {
-                        scale = 1.0;
-                    }
-                }
-                else if (event.key.code == sf::Keyboard::Left)
-                {
-                    deltaX += 0.5 / scale;
-                    update = true;
-                }
-                else if (event.key.code == sf::Keyboard::Right)
-                {
-                    deltaX -= 0.5 / scale;
-                    update = true;
-                }
-                else if (event.key.code == sf::Keyboard::Up)
-                {
-                    deltaY -= 0.5 / scale;
-                    update = true;
-                }
-                else if (event.key.code == sf::Keyboard::Down)
-                {
-                    deltaY += 0.5 / scale;
-                    update = true;
-                }
-                else if (event.key.code == sf::Keyboard::R) // reset
-                {
-                    scale = 1.0;
-                    deltaX = 0.0;
-                    deltaY = 0.0;
-                    update = true;
-                }
-            }
+
+            window.clear();
+
+            window.draw(pixels);
+
+            window.display();
         }
-
-        if (update)
-        {
-            update_colors(pixels, scale, deltaX, deltaY);
-            update = false;
-        }
-
-        window.clear();
-
-        window.draw(pixels);
-
-        window.display();
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+    catch (...)
+    {
+        std::cerr << "other error\n";
     }
 }
 
@@ -172,6 +188,19 @@ void make_pixels(sf::VertexArray& va)
 
 void update_colors(sf::VertexArray& va, const double scale, const double dx, const double dy)
 {
+    size_t size{va.getVertexCount()};
+    size_t numJthreads{ 16 };
+    std::vector<std::jthread> workers(numJthreads);
+    for (size_t i{}; auto& x : workers)
+    {
+        x = std::jthread {update_colors_ranges,
+            std::ref(va), size * i / numJthreads, size * (i + 1) / numJthreads, scale, dx, dy};
+        ++i;
+    }
+}
+
+void update_colors_ranges(sf::VertexArray& va, const size_t begin, const size_t end, const double scale, const double dx, const double dy)
+{
     // x0{ ((xMax - xMin) * va[i].position.x / width + xMin) / scale + dx };
     // y0{ ((yMax - yMin) * (height - va[i].position.y) / height + yMin) / scale + dy };
     // to save computations rewrite above two lines with coefficients and offsets
@@ -181,7 +210,7 @@ void update_colors(sf::VertexArray& va, const double scale, const double dx, con
     auto yCoeff{-(yMax - yMin) /height / scale};
     auto yOffset{yMax / scale + dy};
 
-    for (size_t i{}; i < va.getVertexCount(); ++i)
+    for (size_t i{begin}; i < end; ++i)
     {
         double x0{ xCoeff * va[i].position.x + xOffset };
         double y0{ yCoeff * va[i].position.y + yOffset };
