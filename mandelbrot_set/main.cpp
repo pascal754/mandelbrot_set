@@ -188,14 +188,21 @@ void make_pixels(sf::VertexArray& va)
 
 void update_colors(sf::VertexArray& va, const double scale, const double dx, const double dy)
 {
-    size_t size{va.getVertexCount()};
-    size_t numJthreads{ 16 };
-    std::vector<std::jthread> workers(numJthreads);
-    for (size_t i{}; auto& x : workers)
+    try
     {
-        x = std::jthread {update_colors_ranges,
-            std::ref(va), size * i / numJthreads, size * (i + 1) / numJthreads, scale, dx, dy};
-        ++i;
+        size_t size{ va.getVertexCount() };
+        size_t numJthreads{ 64 };
+        std::vector<std::jthread> workers(numJthreads);
+        for (size_t i{}; auto & x : workers)
+        {
+            x = std::jthread{ update_colors_ranges,
+                std::ref(va), size * i / numJthreads, size * (i + 1) / numJthreads, scale, dx, dy };
+            ++i;
+        }
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
     }
 }
 
