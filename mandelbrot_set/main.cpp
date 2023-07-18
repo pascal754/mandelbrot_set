@@ -23,6 +23,7 @@ import <iostream>;
 import <vector>;
 import <thread>;
 import <stdexcept>;
+import <ranges>;
 
 constexpr double xMin{ -2.0 };
 constexpr double xMax{ 0.47 };
@@ -194,7 +195,7 @@ void update_colors(sf::VertexArray& va, const double scale, const double dx, con
         size_t numJthreads{ 64 };
         std::vector<std::jthread> workers;
         workers.reserve(numJthreads);
-        for (size_t i{}; i < numJthreads; ++i)
+        for (size_t i : std::views::iota(0u, numJthreads))
         {
             workers.emplace_back(update_colors_ranges,
                 std::ref(va), size * i / numJthreads, size * (i + 1) / numJthreads, scale, dx, dy);
