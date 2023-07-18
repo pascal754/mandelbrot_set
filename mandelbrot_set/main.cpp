@@ -192,12 +192,12 @@ void update_colors(sf::VertexArray& va, const double scale, const double dx, con
     {
         size_t size{ va.getVertexCount() };
         size_t numJthreads{ 64 };
-        std::vector<std::jthread> workers(numJthreads);
-        for (size_t i{}; auto & x : workers)
+        std::vector<std::jthread> workers;
+        workers.reserve(numJthreads);
+        for (size_t i{}; i < numJthreads; ++i)
         {
-            x = std::jthread{ update_colors_ranges,
-                std::ref(va), size * i / numJthreads, size * (i + 1) / numJthreads, scale, dx, dy };
-            ++i;
+            workers.emplace_back(update_colors_ranges,
+                std::ref(va), size * i / numJthreads, size * (i + 1) / numJthreads, scale, dx, dy);
         }
     }
     catch (const std::exception& e)
