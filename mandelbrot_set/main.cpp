@@ -36,7 +36,7 @@ constexpr double zoomUnit{ 1.5 };
 
 void make_pixels(sf::VertexArray& va);
 void update_colors(sf::VertexArray& va, const double scale, const double dx, const double dy);
-void update_colors_ranges(sf::VertexArray& va, const size_t begin, const size_t end, const double scale, const double dx, const double dy);
+void update_colors_ranges(sf::VertexArray& va, const size_t begin, const size_t end, const double xCoeff, const double xOffset, const double yCoeff, const double yOffset);
 
 int main()
 {
@@ -167,11 +167,11 @@ int main()
     }
     catch (const std::exception& e)
     {
-        std::cerr << e.what() << '\n';
+        std::println(std::cerr, "{}", e.what());
     }
     catch (...)
     {
-        std::cerr << "other error\n";
+        std::println(std::cerr, "{}", "other error");
     }
 }
 
@@ -193,30 +193,39 @@ void update_colors(sf::VertexArray& va, const double scale, const double dx, con
     {
         size_t size{ va.getVertexCount() };
         size_t numJthreads{ 64 };
-        std::vector<std::jthread> workers;
-        workers.reserve(numJthreads);
+        std::vector<std::jthread> workers(numJthreads);
+
+        // calculate values beforehand
+        auto xCoeff{ (xMax - xMin) / width / scale };
+        auto xOffset{ xMin / scale + dx };
+        auto yCoeff{ -(yMax - yMin) / height / scale };
+        auto yOffset{ yMax / scale + dy };
+
+        for (auto [i, x] : std::views::enumerate(workers))
+        {
+            x = std::jthread{ update_colors_ranges,
+                    std::ref(va), size * i / numJthreads, size * (i + 1) / numJthreads, xCoeff, xOffset, yCoeff, yOffset };
+        }
+
+        // alternative
+        /*workers.reserve(numJthreads);
         for (size_t i : std::views::iota(0u, numJthreads))
         {
             workers.emplace_back(update_colors_ranges,
-                std::ref(va), size * i / numJthreads, size * (i + 1) / numJthreads, scale, dx, dy);
-        }
+                std::ref(va), size * i / numJthreads, size * (i + 1) / numJthreads, xCoeff, xOffset, yCoeff, yOffset);
+        }*/
     }
     catch (const std::exception& e)
     {
-        std::cerr << e.what() << '\n';
+        std::println(std::cerr, "{}", e.what());
     }
 }
 
-void update_colors_ranges(sf::VertexArray& va, const size_t begin, const size_t end, const double scale, const double dx, const double dy)
+void update_colors_ranges(sf::VertexArray& va, const size_t begin, const size_t end, const double xCoeff, const double xOffset, const double yCoeff, const double yOffset)
 {
     // x0{ ((xMax - xMin) * va[i].position.x / width + xMin) / scale + dx };
     // y0{ ((yMax - yMin) * (height - va[i].position.y) / height + yMin) / scale + dy };
     // to save computations rewrite above two lines with coefficients and offsets
-
-    auto xCoeff{ (xMax - xMin) / width / scale };
-    auto xOffset{ xMin / scale + dx };
-    auto yCoeff{-(yMax - yMin) /height / scale};
-    auto yOffset{yMax / scale + dy};
 
     for (size_t i{begin}; i < end; ++i)
     {
