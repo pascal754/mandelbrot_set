@@ -25,9 +25,9 @@ for each pixel (Px, Py) on the screen do
 ## Development Environment
 
 - Microsoft Visual Studio Community 2022 (64-bit) - Preview
-Version 17.6.0 Preview 6.0
+Version 17.14.0 Preview 1.1
 
-- SFML 2.5.1 via vcpkg
+- sfml:x64-windows 3.0.0 via vcpkg
 
 ## Usage
 
